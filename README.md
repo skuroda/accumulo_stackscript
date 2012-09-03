@@ -22,7 +22,7 @@ chmod +x /tmp/stackscript.sh
 After the Linode server boots, it will take about 10 minutes to run this script. Then you can use ssh to login as the 'accumulo' user (the password is 'password'). Run two more commands and your server is completely setup.
 
 ```bash
-accumulo init --clear-instance-name --instance-name instance --password secret"
+accumulo init --clear-instance-name --instance-name instance --password secret
 cd /usr/local/accumulo
 bin/start-all.sh
 ```
