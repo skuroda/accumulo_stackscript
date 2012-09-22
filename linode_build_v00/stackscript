@@ -17,6 +17,9 @@ function add_a_user {
   su $1 -c "cat /home/$1/.ssh/id_dsa.pub >> /home/$1/.ssh/authorized_keys"
   su $1 -c "chmod 600 /home/$1/.ssh/authorized_keys"
   echo "Created user: $1" >> $LOGFILE
+  # If you want to give sudo access to the accounts, uncomment the following line.
+  # NOTE: This instance is very insecure. Proceed with caution.
+  # adduser $1 sudo
 }
 
 # Store the host key fingerprint to avoid a question when
@@ -40,7 +43,7 @@ echo "export PATH=\$ACCUMULO_HOME/bin:\$HADOOP_HOME/bin:\$JAVA_HOME/bin:\$ZOOKEE
 
 echo "Created /etc/rc.local" >> $LOGFILE
 
-apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen
+apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen fail2bin
 echo "Installed packages" >> $LOGFILE
 
 # Disable IP6
