@@ -40,7 +40,7 @@ echo "export PATH=\$ACCUMULO_HOME/bin:\$HADOOP_HOME/bin:\$JAVA_HOME/bin:\$ZOOKEE
 
 echo "Created /etc/rc.local" >> $LOGFILE
 
-apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion
+apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen
 echo "Installed packages" >> $LOGFILE
 
 # Disable IP6

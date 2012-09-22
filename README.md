@@ -27,3 +27,8 @@ cd /usr/local/accumulo
 bin/start-all.sh
 ```
 
+Screen
+======
+
+http://library.linode.com/linux-tools/utilities/screen - the Stackscript installs screen which is useful so that you can always connect to the same session. Type Ctl-A+d in order to detach the session. Use screen -r to reconnect.
+
