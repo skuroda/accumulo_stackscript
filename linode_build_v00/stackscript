@@ -102,7 +102,7 @@ ln -s hadoop-0.20.2 hadoop
 
 # Create the hadoop temp directory. It should not be in the /tmp directory because that directory
 # disappears after each system restart. Something that is done a lot with virtual machines.
-mkdir /hadoop_tmp_dir
+mkdir -p /hadoop_tmp_dir
 chmod 777 /hadoop_tmp_dir
 chown hadoop:hadoop /hadoop_tmp_dir
 
@@ -117,7 +117,7 @@ tar xvfz $CDIR/zookeeper-3.4.3.tar.gz
 cp $CDIR/zoo.cfg /usr/local/zookeeper-3.4.3/conf/zoo.cfg
 chown -R zookeeper:zookeeper /usr/local/zookeeper-3.4.3
 ln -s /usr/local/zookeeper-3.4.3 /usr/local/zookeeper
-mkdir /zookeeper_tmp_dir
+mkdir -p /zookeeper_tmp_dir
 chmod 777 /zookeeper_tmp_dir
 chown zookeeper:zookeeper /zookeeper_tmp_dir
 
@@ -137,9 +137,9 @@ echo "Compiled accumulo" >> $LOGFILE
 # Make the lib/ext directory group writeable so that you can deply jar files there.
 cd /usr/local
 tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz
-mkdir /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
-mkdir /usr/local/accumulo-1.5.0-SNAPSHOT/logs
-mkdir /usr/local/accumulo-1.5.0-SNAPSHOT/walogs
+mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
+mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/logs
+mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/walogs
 chmod g+w /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
 cp /usr/local/accumulo-1.5.0-SNAPSHOT/conf/examples/512MB/standalone/* /usr/local/accumulo-1.5.0-SNAPSHOT/conf
 cp $CDIR/accumulo-site.xml /usr/local/accumulo-1.5.0-SNAPSHOT/conf/accumulo-site.xml
