@@ -44,13 +44,34 @@ echo "- START ------------" >> $LOGFILE
 date +"%Y/%m/%d %H:%M:%S" >> $LOGFILE
 
 function add_a_user {
-  addgroup $1
-  useradd -m -s /bin/bash -g $1 $1 -p $PASSWORD
-  usermod -a -G $1 root
-  su $1 -c "ssh-keygen -t rsa -P '' -f /home/$1/.ssh/id_rsa"
-  su $1 -c "ssh-keygen -t dsa -P '' -f /home/$1/.ssh/id_dsa"
-  su $1 -c "cat /home/$1/.ssh/id_rsa.pub >> /home/$1/.ssh/authorized_keys"
-  su $1 -c "cat /home/$1/.ssh/id_dsa.pub >> /home/$1/.ssh/authorized_keys"
+  # create the group, if needed.
+  result=`getent group $1 | grep $1 | wc -l`
+  if [ "$result" == "0" ];
+  then
+    addgroup $1
+  fi
+  # put the root user into the group, if needed.
+  result=`getent group $1 | grep root | wc -l`
+  if [ "$result" == "0" ];
+  then
+    usermod -a -G $1 root
+  fi
+  # create the user, if needed.
+  result=`getent passwd $1 | grep $1 | wc -l`
+  if [ "$result" == "0" ];
+  then
+    useradd -m -s /bin/bash -g $1 $1 -p $PASSWORD
+  fi
+  if [ ! -f /home/$1/.ssh/id_rsa ];
+  then
+    su $1 -c "ssh-keygen -t rsa -P '' -f /home/$1/.ssh/id_rsa"
+    su $1 -c "cat /home/$1/.ssh/id_rsa.pub >> /home/$1/.ssh/authorized_keys"
+  fi
+  if [ ! -f /home/$1/.ssh/id_dsa ];
+  then
+    su $1 -c "ssh-keygen -t dsa -P '' -f /home/$1/.ssh/id_dsa"
+    su $1 -c "cat /home/$1/.ssh/id_dsa.pub >> /home/$1/.ssh/authorized_keys"
+  fi
   su $1 -c "chmod 600 /home/$1/.ssh/authorized_keys"
   echo "Created user: $1" >> $LOGFILE
   # If you want to give sudo access to the accounts, uncomment the following line.
@@ -60,45 +81,60 @@ function add_a_user {
 
 # Store the host key fingerprint to avoid a question when
 # using SSH for the first time.
-ssh-keyscan -t rsa,dsa localhost >> /etc/ssh/ssh_known_hosts
+result=`grep "ssh-dss" /etc/ssh/ssh_known_hosts | wc -l`
+if [ "$result" == "0" ];
+then
+  ssh-keyscan -t dsa localhost >> /etc/ssh/ssh_known_hosts
+fi
+result=`grep "ssh-rsa" /etc/ssh/ssh_known_hosts | wc -l`
+if [ "$result" == "0" ];
+then
+  ssh-keyscan -t rsa localhost >> /etc/ssh/ssh_known_hosts
+fi
 
 ##########
 # Update the sysctl file to set swappiness. And set it for the current session.
+echo "SYSCTL.CONF: Setting swappiness to 10" >> $LOGFILE
+echo "SYSCTL.CONF: Disabling IPV6" >> $LOGFILE
 cp $CDIR/sysctl.conf /etc/sysctl.conf
 sysctl vm.swappiness=10
 
+##########
+# Create groups and users
 add_a_user accumulo
 add_a_user hadoop
 add_a_user zookeeper
 
-echo "export DEFAULT_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games" >> /etc/profile.d/login_startup.sh
-echo "export ACCUMULO_HOME=/usr/local/accumulo" >> /etc/profile.d/login_startup.sh
-echo "export HADOOP_HOME=/usr/local/hadoop" >> /etc/profile.d/login_startup.sh
-echo "export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-i386" >> /etc/profile.d/login_startup.sh
-echo "export ZOOKEEPER_HOME=/usr/local/zookeeper" >> /etc/profile.d/login_startup.sh
-echo "export PATH=\$ACCUMULO_HOME/bin:\$HADOOP_HOME/bin:\$JAVA_HOME/bin:\$ZOOKEEPER_HOME/bin:\$DEFAULT_PATH" >> /etc/profile.d/login_startup.sh
-
-echo "Created /etc/rc.local" >> $LOGFILE
+##########
+# Setup environment variables when a user logs in.
+result=`grep "ACCUMULO_STACKSCRIPT" /etc/profile.d/login_startup.sh | wc -l`
+if [ "$result" == "0" ];
+then
+  echo "export DEFAULT_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games" >> /etc/profile.d/login_startup.sh
+  echo "export ACCUMULO_HOME=/usr/local/accumulo" >> /etc/profile.d/login_startup.sh
+  echo "export HADOOP_HOME=/usr/local/hadoop" >> /etc/profile.d/login_startup.sh
+  echo "export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-i386" >> /etc/profile.d/login_startup.sh
+  echo "export ZOOKEEPER_HOME=/usr/local/zookeeper" >> /etc/profile.d/login_startup.sh
+  echo "export PATH=\$ACCUMULO_HOME/bin:\$HADOOP_HOME/bin:\$JAVA_HOME/bin:\$ZOOKEEPER_HOME/bin:\$DEFAULT_PATH" >> /etc/profile.d/login_startup.sh
+  echo "# Updated by ACCUMULO_STACKSCRIPT" >> /etc/profile.d/login_startup.sh
+fi
 
 apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen
 #apt-get -y fail2bin
 echo "Installed packages" >> $LOGFILE
 
-# Disable IP6
-echo "#disable ipv6" >> /etc/sysctl.conf
-echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
-echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
-echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
-
 # install and configure hadoop
-cd /usr/local
-tar xvfz $CDIR/hadoop-0.20.2.tar.gz
-cp $CDIR/core-site.xml /usr/local/hadoop-0.20.2/conf/core-site.xml
-cp $CDIR/hdfs-site.xml /usr/local/hadoop-0.20.2/conf/hdfs-site.xml
-cp $CDIR/mapred-site.xml /usr/local/hadoop-0.20.2/conf/mapred-site.xml
-cp $CDIR/hadoop-env.sh /usr/local/hadoop-0.20.2/conf/hadoop-env.sh
-chown -R hadoop:hadoop /usr/local/hadoop-0.20.2
-ln -s hadoop-0.20.2 hadoop
+if [ ! -f /usr/local/hadoop-0.20.2/conf/core-site.xml ];
+then
+  cd /usr/local
+  tar xvfz $CDIR/hadoop-0.20.2.tar.gz
+  cp $CDIR/core-site.xml /usr/local/hadoop-0.20.2/conf/core-site.xml
+  cp $CDIR/hdfs-site.xml /usr/local/hadoop-0.20.2/conf/hdfs-site.xml
+  cp $CDIR/mapred-site.xml /usr/local/hadoop-0.20.2/conf/mapred-site.xml
+  cp $CDIR/hadoop-env.sh /usr/local/hadoop-0.20.2/conf/hadoop-env.sh
+  chown -R hadoop:hadoop /usr/local/hadoop-0.20.2
+  ln -s hadoop-0.20.2 hadoop
+fi
 
 # Create the hadoop temp directory. It should not be in the /tmp directory because that directory
 # disappears after each system restart. Something that is done a lot with virtual machines.
@@ -106,27 +142,51 @@ mkdir -p /hadoop_tmp_dir
 chmod 777 /hadoop_tmp_dir
 chown hadoop:hadoop /hadoop_tmp_dir
 
-su hadoop -c "/usr/local/hadoop/bin/hadoop namenode -format"
-# start hadoop
-su hadoop -c "/usr/local/hadoop/bin/start-dfs.sh"
-su hadoop -c "/usr/local/hadoop/bin/start-mapred.sh"
+##########
+# format hadoop, if needed
+if [ ! -d /hadoop_tmp_dir/dfs/name ];
+then
+  su hadoop -c "/usr/local/hadoop/bin/hadoop namenode -format"
+fi
+
+##########
+# If hadoop is not running, then format the namenode and start hadoop.
+result=`ps faux | grep "org.apache.hadoop.hdfs.server.namenode.NameNode" | wc -l`
+if [ "$result" != "2" ];
+then
+  su hadoop -c "/usr/local/hadoop/bin/start-dfs.sh"
+  su hadoop -c "/usr/local/hadoop/bin/start-mapred.sh"
+fi
 
 # install and configure zookeeper
-cd /usr/local
-tar xvfz $CDIR/zookeeper-3.4.3.tar.gz
-cp $CDIR/zoo.cfg /usr/local/zookeeper-3.4.3/conf/zoo.cfg
-chown -R zookeeper:zookeeper /usr/local/zookeeper-3.4.3
-ln -s /usr/local/zookeeper-3.4.3 /usr/local/zookeeper
-mkdir -p /zookeeper_tmp_dir
-chmod 777 /zookeeper_tmp_dir
-chown zookeeper:zookeeper /zookeeper_tmp_dir
+if [ ! -f /usr/local/zookeeper-3.4.3/conf/zoo.cfg ];
+then
+  cd /usr/local
+  tar xvfz $CDIR/zookeeper-3.4.3.tar.gz
+  cp $CDIR/zoo.cfg /usr/local/zookeeper-3.4.3/conf/zoo.cfg
+  chown -R zookeeper:zookeeper /usr/local/zookeeper-3.4.3
+  ln -s /usr/local/zookeeper-3.4.3 /usr/local/zookeeper
+  mkdir -p /zookeeper_tmp_dir
+  chmod 777 /zookeeper_tmp_dir
+  chown zookeeper:zookeeper /zookeeper_tmp_dir
+fi
 
 # start zookeeper
-su zookeeper -c "cd /usr/local/zookeeper; ./bin/zkServer.sh start"
+result=`ps faux | grep "org.apache.zookeeper.server.quorum.QuorumPeerMain" | wc -l`
+if [ "$result" != "2" ];
+then
+  su zookeeper -c "cd /usr/local/zookeeper; ./bin/zkServer.sh start"
+fi
 
-# download, compile, configure accumulo
-su hadoop -c "/usr/local/hadoop/bin/hadoop fs -mkdir /user/accumulo"
-su hadoop -c "/usr/local/hadoop/bin/hadoop fs -chown accumulo /user/accumulo"
+##########
+# Create an hadoop user directory if needed.
+result=`su hadoop -c "/usr/local/hadoop/bin/hadoop fs -ls /user | grep accumulo | wc -l"`
+if [ "$result" == "0" ];
+then
+  su hadoop -c "/usr/local/hadoop/bin/hadoop fs -mkdir /user/accumulo"
+  su hadoop -c "/usr/local/hadoop/bin/hadoop fs -chown accumulo /user/accumulo"
+fi
+
 su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
 su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
 echo "Cloned accumulo" >> $LOGFILE
@@ -143,9 +203,15 @@ mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/walogs
 chmod g+w /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
 cp /usr/local/accumulo-1.5.0-SNAPSHOT/conf/examples/512MB/standalone/* /usr/local/accumulo-1.5.0-SNAPSHOT/conf
 cp $CDIR/accumulo-site.xml /usr/local/accumulo-1.5.0-SNAPSHOT/conf/accumulo-site.xml
+cp $CDIR/accumulo-env.sh /usr/local/accumulo-1.5.0-SNAPSHOT/conf/accumulo-env.sh
 chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
+
+########
+# remove symbolic link and then create it.
+rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
 
+#su accumulo -c "hadoop fs -rmr /user/accumulo/accumulo"
 #su accumulo -c "/usr/local/accumulo-1.5.0-SNAPSHOT/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
 #su accumulo -c "/usr/local/accumulo-1.5.0-SNAPSHOT/bin/start-all.sh"
 
