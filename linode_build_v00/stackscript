@@ -111,6 +111,16 @@ add_a_user hadoop
 add_a_user zookeeper
 
 ##########
+# Create a supergroup group and put the accumulo user in it so that
+# the Accumulo monitor page can access the Namenode information.
+result=`getent group supergroup | grep supergroup | wc -l`
+if [ "$result" == "0" ];
+then
+  addgroup supergroup
+  adduser accumulo supergroup
+fi
+
+##########
 # Setup the firewall (allow the hadoop, job tracker, and accumulo web pages)
 iptables-restore < $CDIR/iptables.firewall.rules
 
