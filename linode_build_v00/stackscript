@@ -34,6 +34,10 @@ then
   wget -q http://www.affy.com/linode_build/accumulo-site.xml
   wget -q http://www.affy.com/linode_build/accumulo-env.sh
 fi
+if [ ! -f iptables.firewall.rules ];
+then
+  wget -q http://www.affy.com/linode_build/iptables.firewall.rules
+fi
 
 CDIR=`pwd`
 
@@ -105,6 +109,10 @@ sysctl vm.swappiness=10
 add_a_user accumulo
 add_a_user hadoop
 add_a_user zookeeper
+
+##########
+# Setup the firewall (allow the hadoop, job tracker, and accumulo web pages)
+iptables-restore < $CDIR/iptables.firewall.rules
 
 ##########
 # Setup environment variables when a user logs in.
