@@ -32,6 +32,7 @@ if [ ! -f accumulo-site.xml ];
 then
   echo "Getting Accumulo Configuration"
   wget -q http://www.affy.com/linode_build/accumulo-site.xml
+  wget -q http://www.affy.com/linode_build/accumulo-env.sh
 fi
 
 CDIR=`pwd`
@@ -158,6 +159,8 @@ then
   su hadoop -c "/usr/local/hadoop/bin/start-mapred.sh"
 fi
 
+echo "Installed Hadoop" >> $LOGFILE
+
 # install and configure zookeeper
 if [ ! -f /usr/local/zookeeper-3.4.3/conf/zoo.cfg ];
 then
@@ -177,6 +180,8 @@ if [ "$result" != "2" ];
 then
   su zookeeper -c "cd /usr/local/zookeeper; ./bin/zkServer.sh start"
 fi
+
+echo "Installed Zookeeper" >> $LOGFILE
 
 ##########
 # Create an hadoop user directory if needed.
@@ -211,9 +216,9 @@ chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
 
-#su accumulo -c "hadoop fs -rmr /user/accumulo/accumulo"
-#su accumulo -c "/usr/local/accumulo-1.5.0-SNAPSHOT/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
-#su accumulo -c "/usr/local/accumulo-1.5.0-SNAPSHOT/bin/start-all.sh"
+#su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo"
+#su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
+#su accumulo -c "/usr/local/accumulo/bin/start-all.sh"
 
 date +"%Y/%m/%d %H:%M:%S" >> $LOGFILE
 echo "- END ------------" >> $LOGFILE
