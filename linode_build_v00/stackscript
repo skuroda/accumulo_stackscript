@@ -234,9 +234,9 @@ chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
 
-#su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo"
-#su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
-#su accumulo -c "/usr/local/accumulo/bin/start-all.sh"
+su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo"
+su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
+su accumulo -c "/usr/local/accumulo/bin/start-all.sh"
 
 date +"%Y/%m/%d %H:%M:%S" >> $LOGFILE
 echo "- END ------------" >> $LOGFILE
