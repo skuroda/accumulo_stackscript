@@ -37,6 +37,7 @@ fi
 if [ ! -f iptables.firewall.rules ];
 then
   wget -q http://www.affy.com/linode_build/iptables.firewall.rules
+  wget -q http://www.affy.com/linode_build/firewall
 fi
 
 CDIR=`pwd`
@@ -123,6 +124,8 @@ fi
 ##########
 # Setup the firewall (allow the hadoop, job tracker, and accumulo web pages)
 iptables-restore < $CDIR/iptables.firewall.rules
+cp $CDIR/iptables.firewall.rules /etc/iptables.firewall.rules
+cp $CDIR/firewall /etc/network/if-pre-up.d/firewall
 
 ##########
 # Setup environment variables when a user logs in.
