@@ -123,9 +123,9 @@ fi
 
 ##########
 # Setup the firewall (allow the hadoop, job tracker, and accumulo web pages)
-iptables-restore < $CDIR/iptables.firewall.rules
 cp $CDIR/iptables.firewall.rules /etc/iptables.firewall.rules
 cp $CDIR/firewall /etc/network/if-pre-up.d/firewall
+iptables-restore < /etc/iptables.firewall.rules
 
 ##########
 # Setup environment variables when a user logs in.
@@ -145,17 +145,23 @@ apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk s
 #apt-get -y fail2bin
 echo "Installed packages" >> $LOGFILE
 
-# install and configure hadoop
+# install and configure hadoop 
 if [ ! -f /usr/local/hadoop-0.20.2/conf/core-site.xml ];
 then
   cd /usr/local
   tar xvfz $CDIR/hadoop-0.20.2.tar.gz
-  cp $CDIR/core-site.xml /usr/local/hadoop-0.20.2/conf/core-site.xml
-  cp $CDIR/hdfs-site.xml /usr/local/hadoop-0.20.2/conf/hdfs-site.xml
-  cp $CDIR/mapred-site.xml /usr/local/hadoop-0.20.2/conf/mapred-site.xml
-  cp $CDIR/hadoop-env.sh /usr/local/hadoop-0.20.2/conf/hadoop-env.sh
   chown -R hadoop:hadoop /usr/local/hadoop-0.20.2
+  rm -f /usr/local/hadoop
   ln -s hadoop-0.20.2 hadoop
+  cp $CDIR/core-site.xml /usr/local/hadoop/conf/core-site.xml
+  cp $CDIR/hdfs-site.xml /usr/local/hadoop/conf/hdfs-site.xml
+  cp $CDIR/mapred-site.xml /usr/local/hadoop/conf/mapred-site.xml
+  cp $CDIR/hadoop-env.sh /usr/local/hadoop/conf/hadoop-env.sh
+  # Update master and slaves with the hostname
+  hostname -f > /usr/local/hadoop/conf/masters
+  hostname -f > /usr/local/hadoop/conf/slaves
+  sed -i "s/localhost/`hostname -f`/" /usr/local/hadoop/conf/core-site.xml
+  sed -i "s/localhost/`hostname -f`/" /usr/local/hadoop/conf/mapred-site.xml
 fi
 
 # Create the hadoop temp directory. It should not be in the /tmp directory because that directory
