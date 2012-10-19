@@ -229,19 +229,25 @@ echo "Compiled accumulo" >> $LOGFILE
 # Make the lib/ext directory group writeable so that you can deply jar files there.
 cd /usr/local
 tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz
-mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
-mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/logs
-mkdir -p /usr/local/accumulo-1.5.0-SNAPSHOT/walogs
-chmod g+w /usr/local/accumulo-1.5.0-SNAPSHOT/lib/ext
-cp /usr/local/accumulo-1.5.0-SNAPSHOT/conf/examples/512MB/standalone/* /usr/local/accumulo-1.5.0-SNAPSHOT/conf
-cp $CDIR/accumulo-site.xml /usr/local/accumulo-1.5.0-SNAPSHOT/conf/accumulo-site.xml
-cp $CDIR/accumulo-env.sh /usr/local/accumulo-1.5.0-SNAPSHOT/conf/accumulo-env.sh
 chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
-
-########
 # remove symbolic link and then create it.
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
+
+mkdir -p /usr/local/accumulo/lib/ext
+mkdir -p /usr/local/accumulo/logs
+mkdir -p /usr/local/accumulo/walogs
+chmod g+w /usr/local/accumulo/lib/ext
+cp /usr/local/accumulo/conf/examples/512MB/standalone/* /usr/local/accumulo/conf
+cp $CDIR/accumulo-site.xml /usr/local/accumulo/conf/accumulo-site.xml
+cp $CDIR/accumulo-env.sh /usr/local/accumulo/conf/accumulo-env.sh
+hostname -f > /usr/local/accumulo/conf/gc
+hostname -f > /usr/local/accumulo/conf/masters
+hostname -f > /usr/local/accumulo/conf/monitor
+hostname -f > /usr/local/accumulo/conf/slaves
+hostname -f > /usr/local/accumulo/conf/tracers
+
+########
 
 su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo"
 su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
