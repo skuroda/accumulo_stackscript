@@ -13,8 +13,20 @@
 #  Allow HTTP and HTTPS connections from anywhere (the normal ports for websites and SSL).
 -A INPUT -p tcp --dport 80 -j ACCEPT
 -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Zookeeper
+-A INPUT -p tcp --dport 2181 -j ACCEPT
+
+# Hadoop Job Tracker
 -A INPUT -p tcp --dport 50030 -j ACCEPT
+
+# Hadoop Name Node
 -A INPUT -p tcp --dport 50070 -j ACCEPT
+
+# Hadoop Secondary Name Node. No reason to expose this.
+#-A INPUT -p tcp --dport 50090 -j ACCEPT
+
+# Accumulo
 -A INPUT -p tcp --dport 50095 -j ACCEPT
 
 #  Allow SSH connections
