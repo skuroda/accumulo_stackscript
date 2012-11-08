@@ -142,7 +142,7 @@ then
   echo "# Updated by ACCUMULO_STACKSCRIPT" >> /etc/profile.d/login_startup.sh
 fi
 
-apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen
+apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen g++ make
 #apt-get -y fail2bin
 echo "Installed packages" >> $LOGFILE
 
@@ -230,6 +230,11 @@ echo "Compiled accumulo" >> $LOGFILE
 # Make the lib/ext directory group writeable so that you can deply jar files there.
 cd /usr/local
 tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz
+
+# Compile the native libraries
+cd accumulo-1.5.0-SNAPSHOT/server/src/main/c++
+make
+
 chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
 # remove symbolic link and then create it.
 rm -f /usr/local/accumulo
