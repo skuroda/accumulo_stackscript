@@ -68,6 +68,7 @@ function add_a_user {
   then
     useradd -m -s /bin/bash -g $1 $1 -p $PASSWORD
   fi
+  su $1 -c "mkdir -p /home/$1/.ssh"
   if [ ! -f /home/$1/.ssh/id_rsa ];
   then
     su $1 -c "ssh-keygen -t rsa -P '' -f /home/$1/.ssh/id_rsa"
@@ -234,9 +235,9 @@ chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
 
-mkdir -p /usr/local/accumulo/lib/ext
-mkdir -p /usr/local/accumulo/logs
-mkdir -p /usr/local/accumulo/walogs
+su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
+su accumulo -c "mkdir -p /usr/local/accumulo/logs"
+su accumulo -c "mkdir -p /usr/local/accumulo/walogs"
 chmod g+w /usr/local/accumulo/lib/ext
 cp /usr/local/accumulo/conf/examples/512MB/standalone/* /usr/local/accumulo/conf
 cp $CDIR/accumulo-site.xml /usr/local/accumulo/conf/accumulo-site.xml
