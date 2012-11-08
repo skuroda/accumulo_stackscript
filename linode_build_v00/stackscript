@@ -140,6 +140,16 @@ then
   echo "export ZOOKEEPER_HOME=/usr/local/zookeeper" >> /etc/profile.d/login_startup.sh
   echo "export PATH=\$ACCUMULO_HOME/bin:\$HADOOP_HOME/bin:\$JAVA_HOME/bin:\$ZOOKEEPER_HOME/bin:\$DEFAULT_PATH" >> /etc/profile.d/login_startup.sh
   echo "# Updated by ACCUMULO_STACKSCRIPT" >> /etc/profile.d/login_startup.sh
+
+  # export environment to running shell.
+
+  export DEFAULT_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+  export ACCUMULO_HOME=/usr/local/accumulo
+  export HADOOP_HOME=/usr/local/hadoop
+  export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-i386
+  export ZOOKEEPER_HOME=/usr/local/zookeeper
+  export PATH=$ACCUMULO_HOME/bin:$HADOOP_HOME/bin:$JAVA_HOME/bin:$ZOOKEEPER_HOME/bin:$DEFAULT_PATH
+
 fi
 
 apt-get -y install curl git maven2 openssh-server openssh-client openjdk-6-jdk subversion screen g++ make
