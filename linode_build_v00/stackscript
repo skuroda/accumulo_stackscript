@@ -8,36 +8,38 @@ fi
 ##########
 # Make sure we have all of the files locally
 
+BASE_SOURCE_URL=https://raw.github.com/medined/accumulo_stackscript/master/linode_build_v00
+
 if [ ! -f sysctl.conf ];
 then
   echo "Getting Sysctl"
-  wget -q http://www.affy.com/linode_build/sysctl.conf
+  wget -q $BASE_SOURCE_URL/sysctl.conf
 fi
 if [ ! -f hadoop-0.20.2.tar.gz ];
 then
   echo "Getting Hadoop"
-  wget -q http://www.affy.com/linode_build/hadoop-0.20.2.tar.gz
-  wget -q http://www.affy.com/linode_build/core-site.xml 
-  wget -q http://www.affy.com/linode_build/hdfs-site.xml
-  wget -q http://www.affy.com/linode_build/mapred-site.xml
-  wget -q http://www.affy.com/linode_build/hadoop-env.sh
+  wget -q $BASE_SOURCE_URL/hadoop-0.20.2.tar.gz
+  wget -q $BASE_SOURCE_URL/core-site.xml 
+  wget -q $BASE_SOURCE_URL/hdfs-site.xml
+  wget -q $BASE_SOURCE_URL/mapred-site.xml
+  wget -q $BASE_SOURCE_URL/hadoop-env.sh
 fi
 if [ ! -f zookeeper-3.4.3.tar.gz ];
 then
   echo "Getting Zookeeper"
-  wget -q http://www.affy.com/linode_build/zookeeper-3.4.3.tar.gz
-  wget -q http://www.affy.com/linode_build/zoo.cfg
+  wget -q $BASE_SOURCE_URL/zookeeper-3.4.3.tar.gz
+  wget -q $BASE_SOURCE_URL/zoo.cfg
 fi
 if [ ! -f accumulo-site.xml ];
 then
   echo "Getting Accumulo Configuration"
-  wget -q http://www.affy.com/linode_build/accumulo-site.xml
-  wget -q http://www.affy.com/linode_build/accumulo-env.sh
+  wget -q $BASE_SOURCE_URL/accumulo-site.xml
+  wget -q $BASE_SOURCE_URL/accumulo-env.sh
 fi
 if [ ! -f iptables.firewall.rules ];
 then
-  wget -q http://www.affy.com/linode_build/iptables.firewall.rules
-  wget -q http://www.affy.com/linode_build/firewall
+  wget -q $BASE_SOURCE_URL/iptables.firewall.rules
+  wget -q $BASE_SOURCE_URL/firewall
 fi
 
 CDIR=`pwd`
@@ -68,7 +70,11 @@ function add_a_user {
   then
     useradd -m -s /bin/bash -g $1 $1 -p $PASSWORD
   fi
+<<<<<<< HEAD
   su $1 -c "mkdir -p /home/$1/.ssh"
+=======
+  mkdir -p /home/$1/.ssh
+>>>>>>> ad4c26ba65ec6aca9f4acf5190aaa67ce1f16d92
   if [ ! -f /home/$1/.ssh/id_rsa ];
   then
     su $1 -c "ssh-keygen -t rsa -P '' -f /home/$1/.ssh/id_rsa"

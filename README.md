@@ -14,7 +14,7 @@ Step one is to create your own stackscript. Mine was called "InitializeAccumulo"
 
 ```bash
 #!/bin/bash
-wget http://www.affy.com/LinodeBuild/stackscript -O /tmp/stackscript.sh
+wget https://raw.github.com/medined/accumulo_stackscript/master/linode_build_v00/stackscript -O /tmp/stackscript.sh
 chmod +x /tmp/stackscript.sh
 /tmp/stackscript.sh
 ```
