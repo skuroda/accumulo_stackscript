@@ -151,8 +151,6 @@ fi
 
 echo "Installed Hadoop" >> $LOGFILE
 
-exit
-
 # install and configure zookeeper
 if [ ! -f /usr/local/zookeeper-3.4.3/conf/zoo.cfg ];
 then
