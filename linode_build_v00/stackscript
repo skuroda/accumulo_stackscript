@@ -14,11 +14,9 @@ fi
 #  apt-get -y install git
 #  git clone https://github.com/medined/accumulo_stackscript.git
 
-CDIR=`pwd`
-
-PASSWORD=`openssl passwd -1 password`
-
-LOGFILE=/tmp/startup.log
+export CDIR=`pwd`
+export LOGFILE=/tmp/startup.log
+export PASSWORD=`openssl passwd -1 password`
 
 echo "- START ------------" >> $LOGFILE
 date +"%Y/%m/%d %H:%M:%S" >> $LOGFILE
@@ -68,12 +66,14 @@ if [ "$result" == "0" ];
 then
   ssh-keyscan -t dsa localhost >> /etc/ssh/ssh_known_hosts
   ssh-keyscan -t dsa `hostname -f` >> /etc/ssh/ssh_known_hosts
+  ssh-keyscan -t dsa `hostname` >> /etc/ssh/ssh_known_hosts
 fi
 result=`grep "ssh-rsa" /etc/ssh/ssh_known_hosts | wc -l`
 if [ "$result" == "0" ];
 then
   ssh-keyscan -t rsa localhost >> /etc/ssh/ssh_known_hosts
   ssh-keyscan -t rsa `hostname -f` >> /etc/ssh/ssh_known_hosts
+  ssh-keyscan -t rsa `hostname` >> /etc/ssh/ssh_known_hosts
 fi
 
 ##########
@@ -150,6 +150,8 @@ then
 fi
 
 echo "Installed Hadoop" >> $LOGFILE
+
+exit
 
 # install and configure zookeeper
 if [ ! -f /usr/local/zookeeper-3.4.3/conf/zoo.cfg ];
