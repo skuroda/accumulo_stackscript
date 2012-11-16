@@ -70,11 +70,7 @@ function add_a_user {
   then
     useradd -m -s /bin/bash -g $1 $1 -p $PASSWORD
   fi
-<<<<<<< HEAD
   su $1 -c "mkdir -p /home/$1/.ssh"
-=======
-  mkdir -p /home/$1/.ssh
->>>>>>> ad4c26ba65ec6aca9f4acf5190aaa67ce1f16d92
   if [ ! -f /home/$1/.ssh/id_rsa ];
   then
     su $1 -c "ssh-keygen -t rsa -P '' -f /home/$1/.ssh/id_rsa"
