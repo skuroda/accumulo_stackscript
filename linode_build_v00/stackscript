@@ -66,11 +66,13 @@ result=`grep "ssh-dss" /etc/ssh/ssh_known_hosts | wc -l`
 if [ "$result" == "0" ];
 then
   ssh-keyscan -t dsa localhost >> /etc/ssh/ssh_known_hosts
+  ssh-keyscan -t dsa `hostname -f` >> /etc/ssh/ssh_known_hosts
 fi
 result=`grep "ssh-rsa" /etc/ssh/ssh_known_hosts | wc -l`
 if [ "$result" == "0" ];
 then
   ssh-keyscan -t rsa localhost >> /etc/ssh/ssh_known_hosts
+  ssh-keyscan -t rsa `hostname -f` >> /etc/ssh/ssh_known_hosts
 fi
 
 ##########
