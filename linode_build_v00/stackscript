@@ -133,11 +133,10 @@ echo "Installed packages" >> $LOGFILE
 # install and configure hadoop 
 if [ ! -f /usr/local/hadoop-0.20.2/conf/core-site.xml ];
 then
-  cd /usr/local
-  tar xvfz $CDIR/hadoop-0.20.2.tar.gz
+  tar xvfz $CDIR/hadoop-0.20.2.tar.gz -C /usr/local
   chown -R hadoop:hadoop /usr/local/hadoop-0.20.2
   rm -f /usr/local/hadoop
-  ln -s hadoop-0.20.2 hadoop
+  ln -s /usr/local/hadoop-0.20.2 /usr/local/hadoop
   cp $CDIR/core-site.xml /usr/local/hadoop/conf/core-site.xml
   cp $CDIR/hdfs-site.xml /usr/local/hadoop/conf/hdfs-site.xml
   cp $CDIR/mapred-site.xml /usr/local/hadoop/conf/mapred-site.xml
@@ -176,8 +175,7 @@ echo "Installed Hadoop" >> $LOGFILE
 # install and configure zookeeper
 if [ ! -f /usr/local/zookeeper-3.4.3/conf/zoo.cfg ];
 then
-  cd /usr/local
-  tar xvfz $CDIR/zookeeper-3.4.3.tar.gz
+  tar xvfz $CDIR/zookeeper-3.4.3.tar.gz -C /usr/local
   cp $CDIR/zoo.cfg /usr/local/zookeeper-3.4.3/conf/zoo.cfg
   chown -R zookeeper:zookeeper /usr/local/zookeeper-3.4.3
   ln -s /usr/local/zookeeper-3.4.3 /usr/local/zookeeper
@@ -212,11 +210,10 @@ su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true
 echo "Compiled accumulo" >> $LOGFILE
 
 # Make the lib/ext directory group writeable so that you can deply jar files there.
-cd /usr/local
-tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz
+tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz -C /usr/local
 
 # Compile the native libraries
-cd accumulo-1.5.0-SNAPSHOT/server/src/main/c++
+cd /usr/local/accumulo-1.5.0-SNAPSHOT/server/src/main/c++
 make
 
 chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
