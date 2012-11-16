@@ -6,41 +6,13 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ##########
-# Make sure we have all of the files locally
-
-BASE_SOURCE_URL=https://raw.github.com/medined/accumulo_stackscript/master/linode_build_v00
-
-if [ ! -f sysctl.conf ];
-then
-  echo "Getting Sysctl"
-  wget -q $BASE_SOURCE_URL/sysctl.conf
-fi
-if [ ! -f hadoop-0.20.2.tar.gz ];
-then
-  echo "Getting Hadoop"
-  wget -q $BASE_SOURCE_URL/hadoop-0.20.2.tar.gz
-  wget -q $BASE_SOURCE_URL/core-site.xml 
-  wget -q $BASE_SOURCE_URL/hdfs-site.xml
-  wget -q $BASE_SOURCE_URL/mapred-site.xml
-  wget -q $BASE_SOURCE_URL/hadoop-env.sh
-fi
-if [ ! -f zookeeper-3.4.3.tar.gz ];
-then
-  echo "Getting Zookeeper"
-  wget -q $BASE_SOURCE_URL/zookeeper-3.4.3.tar.gz
-  wget -q $BASE_SOURCE_URL/zoo.cfg
-fi
-if [ ! -f accumulo-site.xml ];
-then
-  echo "Getting Accumulo Configuration"
-  wget -q $BASE_SOURCE_URL/accumulo-site.xml
-  wget -q $BASE_SOURCE_URL/accumulo-env.sh
-fi
-if [ ! -f iptables.firewall.rules ];
-then
-  wget -q $BASE_SOURCE_URL/iptables.firewall.rules
-  wget -q $BASE_SOURCE_URL/firewall
-fi
+# Paradigm shift - instead of pulling each file individually just
+# get the whole project from github in one shot.
+#
+# Before this script is called have your system do:
+#
+#  apt-get -y install git
+#  git clone https://github.com/medined/accumulo_stackscript.git
 
 CDIR=`pwd`
 
@@ -250,7 +222,7 @@ make
 chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
 # remove symbolic link and then create it.
 rm -f /usr/local/accumulo
-ln -s /usr/local/accumulo-1.5.0-SNAPSHOT accumulo
+ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
 
 su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
 su accumulo -c "mkdir -p /usr/local/accumulo/logs"
