@@ -16,7 +16,7 @@ fi
 #  git clone https://github.com/medined/accumulo_stackscript.git
 
 export CDIR=`pwd`
-export LOGFILE=build.log
+export LOGFILE=/root/build.log
 export PASSWORD=`openssl passwd -1 password`
 
 ##########
