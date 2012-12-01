@@ -192,23 +192,36 @@ then
   su hadoop -c "/usr/local/hadoop/bin/hadoop fs -chown accumulo /user/accumulo"
 fi
 
-su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
-su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
-echo "Cloned accumulo"
+# su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
+# su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
+# echo "Cloned accumulo"
 
-su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true package -P assemble"
-echo "Compiled accumulo"
+# su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true package -P assemble"
+# echo "Compiled accumulo"
 
-tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz -C /usr/local
+# tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz -C /usr/local
 
-# Compile the native libraries
-cd /usr/local/accumulo-1.5.0-SNAPSHOT/server/src/main/c++
+# # Compile the native libraries
+# cd /usr/local/accumulo-1.5.0-SNAPSHOT/server/src/main/c++
+# make
+
+# chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
+
+# # remove symbolic link and then create it.
+# rm -f /usr/local/accumulo
+# ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
+
+wget http://www.eng.lsu.edu/mirrors/apache/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz
+tar xvfz /home/accumulo/accumulo-1.4.2-dist.tar.gz -C /usr/local
+
+cd /usr/local/accumulo-1.4.2/src/server/src/main/c++
 make
+chown -R accumulo:accumulo /usr/local/accumulo-1.4.2
 
-chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
-# remove symbolic link and then create it.
 rm -f /usr/local/accumulo
-ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
+ln -s /usr/local/accumulo-1.4.2 /usr/local/accumulo
+
+
 
 su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
 su accumulo -c "mkdir -p /usr/local/accumulo/logs"
