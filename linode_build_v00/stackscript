@@ -211,7 +211,7 @@ fi
 # rm -f /usr/local/accumulo
 # ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
 
-wget --directory-prefix=/home/accumulo http://www.eng.lsu.edu/mirrors/apache/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz
+su accumulo -c "wget --directory-prefix=/home/accumulo http://www.eng.lsu.edu/mirrors/apache/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz"
 tar xvfz /home/accumulo/accumulo-1.4.2-dist.tar.gz -C /usr/local
 
 cd /usr/local/accumulo-1.4.2/src/server/src/main/c++
