@@ -216,17 +216,14 @@ tar xvfz /home/accumulo/accumulo-1.4.2-dist.tar.gz -C /usr/local
 
 cd /usr/local/accumulo-1.4.2/src/server/src/main/c++
 make
-chown -R accumulo:accumulo /usr/local/accumulo-1.4.2
 
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.4.2 /usr/local/accumulo
 
-
-
 su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
 su accumulo -c "mkdir -p /usr/local/accumulo/logs"
 su accumulo -c "mkdir -p /usr/local/accumulo/walogs"
-# Make the lib/ext directory group writeable so that you can deply jar files there.
+# Make the lib/ext directory group writeable so that you can deploy jar files there.
 chmod g+w /usr/local/accumulo/lib/ext
 cp /usr/local/accumulo/conf/examples/512MB/standalone/* /usr/local/accumulo/conf
 cp $CDIR/accumulo-site.xml /usr/local/accumulo/conf/accumulo-site.xml
@@ -237,6 +234,7 @@ hostname -f > /usr/local/accumulo/conf/monitor
 hostname -f > /usr/local/accumulo/conf/slaves
 hostname -f > /usr/local/accumulo/conf/tracers
 
+chown -R accumulo:accumulo /usr/local/accumulo-1.4.2
 ########
 
 su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo 2>/dev/null"
