@@ -220,9 +220,9 @@ make
 rm -f /usr/local/accumulo
 ln -s /usr/local/accumulo-1.4.2 /usr/local/accumulo
 
-su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
-su accumulo -c "mkdir -p /usr/local/accumulo/logs"
-su accumulo -c "mkdir -p /usr/local/accumulo/walogs"
+mkdir -p /usr/local/accumulo/lib/ext
+mkdir -p /usr/local/accumulo/logs
+mkdir -p /usr/local/accumulo/walogs
 # Make the lib/ext directory group writeable so that you can deploy jar files there.
 chmod g+w /usr/local/accumulo/lib/ext
 cp /usr/local/accumulo/conf/examples/512MB/standalone/* /usr/local/accumulo/conf
@@ -240,7 +240,7 @@ chown -R accumulo:accumulo /usr/local/accumulo
 
 su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo 2>/dev/null"
 #su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
-su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name < init.info"
+su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name < $CDIR/init.info"
 su accumulo -c "/usr/local/accumulo/bin/start-all.sh"
 
 date +"%Y/%m/%d %H:%M:%S"
