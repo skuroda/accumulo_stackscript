@@ -192,38 +192,28 @@ then
   su hadoop -c "/usr/local/hadoop/bin/hadoop fs -chown accumulo /user/accumulo"
 fi
 
-# su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
-# su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
-# echo "Cloned accumulo"
+su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
+su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
+echo "Cloned accumulo"
 
-# su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true package -P assemble"
-# echo "Compiled accumulo"
+su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true package -P assemble"
+echo "Compiled accumulo"
 
-# tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz -C /usr/local
+tar xvfz /home/accumulo/workspace/accumulo/assemble/target/accumulo-1.5.0-SNAPSHOT-dist.tar.gz -C /usr/local
 
-# # Compile the native libraries
-# cd /usr/local/accumulo-1.5.0-SNAPSHOT/server/src/main/c++
-# make
-
-# chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
-
-# # remove symbolic link and then create it.
-# rm -f /usr/local/accumulo
-# ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
-
-su accumulo -c "wget --directory-prefix=/home/accumulo http://www.eng.lsu.edu/mirrors/apache/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz"
-tar xvfz /home/accumulo/accumulo-1.4.2-dist.tar.gz -C /usr/local
-
-cd /usr/local/accumulo-1.4.2/src/server/src/main/c++
+# Compile the native libraries
+cd /usr/local/accumulo-1.5.0-SNAPSHOT/server/src/main/c++
 make
 
+chown -R accumulo:accumulo /usr/local/accumulo-1.5.0-SNAPSHOT
+# remove symbolic link and then create it.
 rm -f /usr/local/accumulo
-ln -s /usr/local/accumulo-1.4.2 /usr/local/accumulo
+ln -s /usr/local/accumulo-1.5.0-SNAPSHOT /usr/local/accumulo
 
-mkdir -p /usr/local/accumulo/lib/ext
-mkdir -p /usr/local/accumulo/logs
-mkdir -p /usr/local/accumulo/walogs
-# Make the lib/ext directory group writeable so that you can deploy jar files there.
+su accumulo -c "mkdir -p /usr/local/accumulo/lib/ext"
+su accumulo -c "mkdir -p /usr/local/accumulo/logs"
+su accumulo -c "mkdir -p /usr/local/accumulo/walogs"
+# Make the lib/ext directory group writeable so that you can deply jar files there.
 chmod g+w /usr/local/accumulo/lib/ext
 cp /usr/local/accumulo/conf/examples/512MB/standalone/* /usr/local/accumulo/conf
 cp $CDIR/accumulo-site.xml /usr/local/accumulo/conf/accumulo-site.xml
@@ -234,13 +224,10 @@ hostname -f > /usr/local/accumulo/conf/monitor
 hostname -f > /usr/local/accumulo/conf/slaves
 hostname -f > /usr/local/accumulo/conf/tracers
 
-chown -R accumulo:accumulo /usr/local/accumulo-1.4.2
-chown -R accumulo:accumulo /usr/local/accumulo
 ########
 
 su accumulo -c "/usr/local/hadoop/bin/hadoop fs -rmr /user/accumulo/accumulo 2>/dev/null"
-#su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
-su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name < $CDIR/init.info"
+su accumulo -c "/usr/local/accumulo/bin/accumulo init --clear-instance-name --instance-name instance --password secret"
 su accumulo -c "/usr/local/accumulo/bin/start-all.sh"
 
 date +"%Y/%m/%d %H:%M:%S"
