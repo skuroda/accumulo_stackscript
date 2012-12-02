@@ -193,7 +193,7 @@ then
 fi
 
 su accumulo -c "mkdir -p /home/accumulo/workspace/accumulo"
-su accumulo -c "svn co https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
+su accumulo -c "svn co -r 1405439 https://svn.apache.org/repos/asf/accumulo/trunk /home/accumulo/workspace/accumulo"
 echo "Cloned accumulo"
 
 su accumulo -c "cd /home/accumulo/workspace/accumulo; mvn -Dmaven.test.skip=true package -P assemble"
